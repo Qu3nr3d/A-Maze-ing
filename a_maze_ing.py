@@ -8,8 +8,8 @@ def main() -> None:
     configs = parser.parse_configs(unparsed)
     print(configs)
     labirynth = mazegen.MazeGenerator(configs)
-    labirynth.generate_grid()
-    for line in labirynth.grid:
+    maze = labirynth.generate_grid()
+    for line in maze:
         print(line)
 
 

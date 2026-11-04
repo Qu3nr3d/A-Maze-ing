@@ -36,6 +36,11 @@ def parse_configs(settings_dict: dict[str, str])\
             parsed_settings["PERFECT"] = False
         else:
             parsed_settings["PERFECT"] = True
+            try:
+                if parsed_settings["SEED"] == "":
+                    parsed_settings["SEED"] = None
+            except KeyError:
+                parsed_settings["SEED"] = None
     except ValueError:
         print("Invalid filename")
         sys.exit(1)

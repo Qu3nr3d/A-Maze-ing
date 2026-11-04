@@ -10,3 +10,13 @@ EXIT=19,14
 OUTPUT_FILE=maze.txt
 # Is the maze perfect?
 PERFECT=True
+# If SEED setting is invalid/empty seed is set to None
+# meaning randomness is based on system time
+SEED=
+# | | | | | | | | |
+# | x | | | x x x |
+# | x | | | | | x |
+# | x x x C x x x |
+# | | | x | x | | |
+# | | | x | x x x |
+# | | | | | | | | |
