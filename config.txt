@@ -1,6 +1,7 @@
+# Every setting has to be in one line with it's value
 # Maze width (number of cells):
 WIDTH=20
-# Maze height"
+# Maze height
 HEIGHT=15
 # Entry coordinates (x,y):
 ENTRY=0,0
@@ -12,11 +13,4 @@ OUTPUT_FILE=maze.txt
 PERFECT=True
 # If SEED setting is invalid/empty seed is set to None
 # meaning randomness is based on system time
-SEED=
-# | | | | | | | | |
-# | x | | | x x x |
-# | x | | | | | x |
-# | x x x C x x x |
-# | | | x | x | | |
-# | | | x | x x x |
-# | | | | | | | | |
+SEED=42
