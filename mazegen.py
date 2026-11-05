@@ -1,5 +1,4 @@
 import random as rnd
-from collections import deque
 
 
 class MazeGenerator:
@@ -22,6 +21,13 @@ class MazeGenerator:
         """method to generate maze by following Prims's algorithm"""
         self._grid = [[15 for _ in range(self._width)]
                       for _ in range(self._height)]
+        N, E, S, W = 1, 2, 4, 8
+        directions = {
+            'N': (-1, 0, N, S),
+            'S': (1, 0, S, N),
+            'E': (0, 1, E, W),
+            'W': (0, -1, W, E)
+                    }
 
         def add_forty_two() -> list[tuple[int, int]]:
             """restricted '42' symbol area is saved to list of positions"""
@@ -33,41 +39,40 @@ class MazeGenerator:
                 (y, x + 3), (y, x + 2), (y, x + 1), (y + 1, x + 1),
                 (y + 2, x + 1), (y + 2, x + 2), (y + 2, x + 3)
                     ]
-        def possible_move(position: tuple[int, int]) -> list[tuple[int, int]] :
+
+        def valid_moves(y: int, x: int) -> list[tuple[tuple[int, int]], int] :
             """Return a list of possible moves"""
             moves = []
-            if position[0] != 0:
-                moves.append((-1, 0))
-            if position[0] != self._height:
-                moves.append((1, 0))
-            if position[1] != 0:
-                moves.append((-1, 0))
-            if position[1] != self._width:
-                moves.append((1, 0))
+            for key, (dy, dx, dir_from, dir_to) in directions.items():
+                ny, nx = y + dy, x + dx
+                if 0 <= ny < self._height and 0 <= nx < self._width:
+                    if (ny, nx) not in visited:
+                        moves.append(((y, x), (ny, nx), dir_from, dir_to))
             return moves
 
-        visited = []
+        visited = set()
         if self._has_forty_two is True:
-            visited = add_forty_two()
+            visited = set(add_forty_two())
         curr_y, curr_x = (0, 0)
         rnd.seed(self._seed)
         while True:
-            curr_y, curr_x = (rnd.randint(0, self._height),
-                              rnd.randint(0, self._width))
+            curr_y, curr_x = (rnd.randint(0, self._height - 1),
+                              rnd.randint(0, self._width - 1))
             if (curr_y, curr_x) not in visited:
                 break
-        queue = deque()
-        queue.append((curr_y, curr_x))
+        queue = valid_moves(curr_y, curr_x)
+        visited.add((curr_y, curr_x))
         while queue:
-            for move in possible_move((curr_y, curr_x)):
-                new_pos = (curr_y + move[0], curr_x + move[1])
-                if new_pos not in visited:
-                    queue.append(new_pos)
-                    print(queue)
-            new_pos = rnd.choice(queue)
-            curr_x, curr_y = new_pos
-            queue.remove(new_pos)
-        return [1,2]#self._grid
+            move = rnd.choice(queue)
+            queue.remove(move)
+            (curr_y, curr_x), (new_y, new_x), dir_from, dir_to = move
+            if (new_y, new_x) not in visited:
+                visited.add((new_y, new_y))
+                self._grid[curr_y][curr_x] -= dir_from
+                self._grid[new_y][new_x] -= dir_to
+            new_moves = valid_moves(new_y, new_x)
+            queue.extend(new_moves)
+        return self._grid
 
     def solve_maze(self) -> list[str]:
         """method to return path from ENTRY to EXIT with BSF algorithm"""
