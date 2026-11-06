@@ -12,7 +12,7 @@ class MazeGenerator:
         self._output_file: str = configs["OUTPUT_FILE"]
         self._is_perfect: bool = configs["PERFECT"]
         self._seed = configs["SEED"]
-        if self._height <= 5 or self._height <= 7:
+        if self._height <= 5 or self._width <= 7:
             self._has_forty_two = False
         else:
             self._has_forty_two = True
@@ -31,14 +31,15 @@ class MazeGenerator:
 
         def add_forty_two() -> list[tuple[int, int]]:
             """restricted '42' symbol area is saved to list of positions"""
-            x, y = (self._width // 2, self._height // 2)
-            return [
+            x, y = self._width // 2, self._height // 2
+            points = set([
                 (y - 2, x - 3), (y - 1, x - 3), (y, x - 3),
                 (y, x - 2), (y, x - 1), (y + 1, x - 1), (y + 2, x - 1),
                 (y - 2, x + 1), (y - 2, x + 2), (y - 2, x + 3), (y - 1, x + 3),
                 (y, x + 3), (y, x + 2), (y, x + 1), (y + 1, x + 1),
                 (y + 2, x + 1), (y + 2, x + 2), (y + 2, x + 3)
-                    ]
+                        ])
+            return points
 
         def valid_moves(y: int, x: int) -> list[tuple[tuple[int, int]], int] :
             """Return a list of possible moves"""
@@ -52,7 +53,7 @@ class MazeGenerator:
 
         visited = set()
         if self._has_forty_two is True:
-            visited = set(add_forty_two())
+            visited.update(add_forty_two())
         curr_y, curr_x = (0, 0)
         rnd.seed(self._seed)
         while True:
@@ -67,12 +68,21 @@ class MazeGenerator:
             queue.remove(move)
             (curr_y, curr_x), (new_y, new_x), dir_from, dir_to = move
             if (new_y, new_x) not in visited:
-                visited.add((new_y, new_y))
+                visited.add((new_y, new_x))
                 self._grid[curr_y][curr_x] -= dir_from
                 self._grid[new_y][new_x] -= dir_to
-            new_moves = valid_moves(new_y, new_x)
-            queue.extend(new_moves)
+                new_moves = valid_moves(new_y, new_x)
+                queue.extend(new_moves)
         return self._grid
 
     def solve_maze(self) -> list[str]:
         """method to return path from ENTRY to EXIT with BSF algorithm"""
+
+    def send_maze_to_file(self) -> None:
+        with open(f"{self._output_file}", "w") as file:
+            formated = [[f"{num:x}" for num in line] for line in self._grid]
+            for line in formated:
+                for char in line:
+                    file.write(char)
+                file.write("\n")
+0
