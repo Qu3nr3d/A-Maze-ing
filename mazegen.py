@@ -26,8 +26,8 @@ class MazeGenerator:
         N, E, S, W = 1, 2, 4, 8
         directions = {
             'N': (-1, 0, N, S),
-            'S': (1, 0, S, N),
             'E': (0, 1, E, W),
+            'S': (1, 0, S, N),
             'W': (0, -1, W, E)
                     }
 
@@ -79,22 +79,22 @@ class MazeGenerator:
 
     def solve_maze(self) -> list[str]:
         """method to return path from ENTRY to EXIT with BSF algorithm"""
-        N, E, S, W = 1, 2, 4, 8
-        directions = {
-            'N': (-1, 0, S),
-            'S': (1, 0, N),
-            'E': (0, 1, W),
-            'W': (0, -1, E)
-                    }
+        directions = [
+            (-1, 0, 'N', 1),
+            (1, 0, 'E', 2),
+            (0, 1, 'S', 4),
+            (0, -1, 'W', 8)
+                    ]
 
-        def valid_moves(y: int, x: int) -> list[tuple[tuple[int, int]], int] :
+        def valid_moves(y: int, x: int) -> list[tuple[int, int], int] :
             """Return a list of possible moves"""
             moves = []
-            for key, (dy, dx, dir_to) in directions.items():
+            for (dy, dx, dir_to, wall_idx) in directions:
                 ny, nx = y + dy, x + dx
                 if 0 <= ny < self._height and 0 <= nx < self._width:
-                    if (ny, nx) not in visited:
-                        moves.append(((y, x), (ny, nx), dir_to))
+                    if (ny, nx) not in visited and\
+                        not (self._grid[y][x] & wall_idx):
+                            moves.append(((y, x), (ny, nx), dir_to))
             return moves
 
         visited = set()
@@ -102,25 +102,34 @@ class MazeGenerator:
         goal = self._exit
         self._path = []
         queue = deque()
-        queue.append(valid_moves(curr_y, curr_x))
+        queue.extend(valid_moves(curr_y, curr_x))
         visited.add((curr_y, curr_x))
         while queue:
-            move = rnd.choice(queue)
-            queue.remove(move)
-            (curr_y, curr_x), (new_y, new_x), dir_from, dir_to = move
+            move = queue.popleft()
+            (curr_y, curr_x), (new_y, new_x), dir_to = move
             if (new_y, new_x) == goal:
+                self._path.append(dir_to)
                 break
             elif (new_y, new_x) not in visited:
                 visited.add((new_y, new_x))
+                self._path.append(dir_to)
                 new_moves = valid_moves(new_y, new_x)
                 queue.extend(new_moves)
         return self._path
 
     def send_maze_to_file(self) -> None:
         with open(f"{self._output_file}", "w") as file:
-            formated = [[f"{num:x}" for num in line] for line in self._grid]
-            for line in formated:
+            formated_grid = [[f"{num:x}" for num in line]
+                              for line in self._grid]
+            for line in formated_grid:
                 for char in line:
                     file.write(char)
                 file.write("\n")
-
+            file.write(f"\n{self._entry[0]},{self._entry[1]}\n"
+                       f"{self._exit[0]},{self._exit[1]}\n")
+            try:
+                for dir in self._path:
+                    file.write(dir)
+                file.write("\n")
+            except AttributeError as e:
+                print(f"{e} (solve_maze() not called)")

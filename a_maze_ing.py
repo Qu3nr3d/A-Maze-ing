@@ -9,8 +9,9 @@ def main() -> None:
     print(configs)
     labirynth = mazegen.MazeGenerator(configs)
     maze = labirynth.generate_perfect_maze()
-    for line in maze:
-        print("".join(format(char, "x") for char in line))
+    #for line in maze:
+    #    print("".join(format(char, "x") for char in line))
+    labirynth.solve_maze()
     labirynth.send_maze_to_file()
 
 if __name__ == "__main__":

@@ -3,10 +3,10 @@
 WIDTH=20
 # Maze height
 HEIGHT=15
-# Entry coordinates (x,y):
-ENTRY=0,0
-# Exit coordinates (x,y)
-EXIT=19,14
+# Entry coordinates (y,x):
+ENTRY=2,2
+# Exit coordinates (y,x)
+EXIT=3,3
 # Output filename
 OUTPUT_FILE=maze.txt
 # Is the maze perfect?
