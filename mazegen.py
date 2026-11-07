@@ -1,9 +1,11 @@
 import random as rnd
+from collections import deque
 
 
 class MazeGenerator:
     """This class provides methods to generate maze based on given configs"""
-    def __init__(self, configs: dict[str, int | tuple[int, int] | str | bool]):
+    def __init__(self, configs: dict[str, int | tuple[int, int] | str | bool])\
+        -> None:
         """Saves configurations as attributes"""
         self._width: int = configs["WIDTH"]
         self._height: int = configs["HEIGHT"]
@@ -17,7 +19,7 @@ class MazeGenerator:
         else:
             self._has_forty_two = True
 
-    def generate_maze(self) -> list[list]:
+    def generate_perfect_maze(self) -> list[list]:
         """method to generate maze by following Prims's algorithm"""
         self._grid = [[15 for _ in range(self._width)]
                       for _ in range(self._height)]
@@ -41,8 +43,8 @@ class MazeGenerator:
                         ])
             return points
 
-        def valid_moves(y: int, x: int) -> list[tuple[tuple[int, int]], int] :
-            """Return a list of possible moves"""
+        def valid_dirs(y: int, x: int) -> list[tuple[tuple[int, int]], int] :
+            """Return a list of possible wall openings"""
             moves = []
             for key, (dy, dx, dir_from, dir_to) in directions.items():
                 ny, nx = y + dy, x + dx
@@ -61,7 +63,7 @@ class MazeGenerator:
                               rnd.randint(0, self._width - 1))
             if (curr_y, curr_x) not in visited:
                 break
-        queue = valid_moves(curr_y, curr_x)
+        queue = valid_dirs(curr_y, curr_x)
         visited.add((curr_y, curr_x))
         while queue:
             move = rnd.choice(queue)
@@ -71,12 +73,48 @@ class MazeGenerator:
                 visited.add((new_y, new_x))
                 self._grid[curr_y][curr_x] -= dir_from
                 self._grid[new_y][new_x] -= dir_to
-                new_moves = valid_moves(new_y, new_x)
+                new_moves = valid_dirs(new_y, new_x)
                 queue.extend(new_moves)
         return self._grid
 
     def solve_maze(self) -> list[str]:
         """method to return path from ENTRY to EXIT with BSF algorithm"""
+        N, E, S, W = 1, 2, 4, 8
+        directions = {
+            'N': (-1, 0, S),
+            'S': (1, 0, N),
+            'E': (0, 1, W),
+            'W': (0, -1, E)
+                    }
+
+        def valid_moves(y: int, x: int) -> list[tuple[tuple[int, int]], int] :
+            """Return a list of possible moves"""
+            moves = []
+            for key, (dy, dx, dir_to) in directions.items():
+                ny, nx = y + dy, x + dx
+                if 0 <= ny < self._height and 0 <= nx < self._width:
+                    if (ny, nx) not in visited:
+                        moves.append(((y, x), (ny, nx), dir_to))
+            return moves
+
+        visited = set()
+        curr_y, curr_x = self._entry
+        goal = self._exit
+        self._path = []
+        queue = deque()
+        queue.append(valid_moves(curr_y, curr_x))
+        visited.add((curr_y, curr_x))
+        while queue:
+            move = rnd.choice(queue)
+            queue.remove(move)
+            (curr_y, curr_x), (new_y, new_x), dir_from, dir_to = move
+            if (new_y, new_x) == goal:
+                break
+            elif (new_y, new_x) not in visited:
+                visited.add((new_y, new_x))
+                new_moves = valid_moves(new_y, new_x)
+                queue.extend(new_moves)
+        return self._path
 
     def send_maze_to_file(self) -> None:
         with open(f"{self._output_file}", "w") as file:
@@ -85,4 +123,4 @@ class MazeGenerator:
                 for char in line:
                     file.write(char)
                 file.write("\n")
-0
+
