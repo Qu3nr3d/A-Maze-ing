@@ -81,8 +81,8 @@ class MazeGenerator:
         """method to return path from ENTRY to EXIT with BSF algorithm"""
         directions = [
             (-1, 0, 'N', 1),
-            (1, 0, 'E', 2),
-            (0, 1, 'S', 4),
+            (0, 1, 'E', 2),
+            (1, 0, 'S', 4),
             (0, -1, 'W', 8)
                     ]
 
