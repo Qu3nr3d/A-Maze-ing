@@ -77,7 +77,7 @@ class MazeGenerator:
                 queue.extend(new_moves)
         return self._grid
 
-    def solve_maze(self) -> list[str]:
+    def solve_maze(self) -> list[tuple[int, int, str]] :
         """method to return path from ENTRY to EXIT with BSF algorithm"""
         directions = [
             (-1, 0, 'N', 1),
@@ -86,7 +86,8 @@ class MazeGenerator:
             (0, -1, 'W', 8)
                     ]
 
-        def valid_moves(y: int, x: int) -> list[tuple[int, int], int] :
+        def valid_moves(y: int, x: int) -> list[tuple[int, int],
+                                                tuple[int, int], str] :
             """Return a list of possible moves"""
             moves = []
             for (dy, dx, dir_to, wall_idx) in directions:
@@ -99,22 +100,32 @@ class MazeGenerator:
 
         visited = set()
         curr_y, curr_x = self._entry
-        goal = self._exit
-        self._path = []
-        queue = deque()
-        queue.extend(valid_moves(curr_y, curr_x))
         visited.add((curr_y, curr_x))
+        queue = deque()
+        for new_move in valid_moves(curr_y, curr_x):
+            queue.append(new_move)
+            visited.add(new_move[1])
+        self._path = {}
+        goal = self._exit
         while queue:
             move = queue.popleft()
             (curr_y, curr_x), (new_y, new_x), dir_to = move
+            self._path.update({(new_y, new_x):(curr_y, curr_x, dir_to)})
+            visited.add((new_y, new_x))
             if (new_y, new_x) == goal:
-                self._path.append(dir_to)
+                self._path.update({(new_y, new_x):(curr_y, curr_x, dir_to)})
+                shortest_route = []
+                while (new_y, new_x) != self._entry:
+                    parent_y, parent_x, dir_to = self._path[(new_y, new_x)]
+                    shortest_route.append((new_y, new_x, dir_to))
+                    new_y, new_x = parent_y, parent_x
+                self._path.clear()
+                shortest_route.reverse()
+                self._path = shortest_route
                 break
-            elif (new_y, new_x) not in visited:
-                visited.add((new_y, new_x))
-                self._path.append(dir_to)
-                new_moves = valid_moves(new_y, new_x)
-                queue.extend(new_moves)
+            for new_move in valid_moves(new_y, new_x):
+                queue.append(new_move)
+                visited.add(new_move[1])
         return self._path
 
     def send_maze_to_file(self) -> None:
@@ -128,8 +139,8 @@ class MazeGenerator:
             file.write(f"\n{self._entry[0]},{self._entry[1]}\n"
                        f"{self._exit[0]},{self._exit[1]}\n")
             try:
-                for dir in self._path:
-                    file.write(dir)
+                for move in self._path:
+                    file.write(move[2])
                 file.write("\n")
             except AttributeError as e:
                 print(f"{e} (solve_maze() not called)")
