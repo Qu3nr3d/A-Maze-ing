@@ -1,5 +1,5 @@
 import parser
-import mazegen
+from src import mazegen
 
 
 def main() -> None:

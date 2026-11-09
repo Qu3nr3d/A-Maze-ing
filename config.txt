@@ -4,13 +4,13 @@ WIDTH=20
 # Maze height
 HEIGHT=15
 # Entry coordinates (y,x):
-ENTRY=0,0
+ENTRY=1,0
 # Exit coordinates (y,x)
-EXIT=0,1
+EXIT=14,19
 # Output filename
 OUTPUT_FILE=maze.txt
 # Is the maze perfect?
 PERFECT=True
 # If SEED setting is invalid/empty seed is set to None
 # meaning randomness is based on system time
-SEED=
+SEED=42
