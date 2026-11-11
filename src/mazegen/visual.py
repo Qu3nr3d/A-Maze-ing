@@ -213,8 +213,8 @@ def load_maze(path: Path,) -> tuple[list[list[int]],tuple[int, int],tuple[int, i
     if len(info) != 3:
         raise ValueError("Invalid maze metadata")
 
-    entry_y, entry_x = map(int, info[0].split(","))
-    exit_y, exit_x = map(int, info[1].split(","))
+    entry_x, entry_y = map(int, info[0].split(","))
+    exit_x, exit_y = map(int, info[1].split(","))
     entry = (entry_x, entry_y)
     exit_pos = (exit_x, exit_y)
     solution = info[2].strip()
