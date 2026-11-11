@@ -50,8 +50,8 @@ def parse_configs(settings_dict: dict[str, str])\
             int((parsed_settings["ENTRY"].split(","))[1])
             )
         parsed_settings["EXIT"] = (
-            int((parsed_settings["EXIT"].split(","))[0]),
-            int((parsed_settings["EXIT"].split(","))[1])
+            int((parsed_settings["EXIT"].split(","))[1]),
+            int((parsed_settings["EXIT"].split(","))[0])
             )
         if parsed_settings["OUTPUT_FILE"] == "":
             raise TypeError

@@ -16,13 +16,14 @@ class MazeGenerator:
         self._output_file: str = configs["OUTPUT_FILE"]
         self._is_perfect: bool = configs["PERFECT"]
         self._seed = configs["SEED"]
+        print(self._entry, self._exit)
         if self._height <= 5 or self._width <= 7:
             self._has_forty_two = False
         else:
             self._has_forty_two = True
 
     def forty_two_symbol(self) -> list[tuple[int, int]]:
-        """restricted '42' symbol area is saved to list of positions"""
+        """Returns restricted '42' symbol area as a list of positions"""
         x, y = self._width // 2, self._height // 2
         points = set([
             (y - 2, x - 3), (y - 1, x - 3), (y, x - 3),
@@ -33,7 +34,7 @@ class MazeGenerator:
                     ])
         return points
 
-    def generate_perfect_maze(self) -> list[list]:
+    def generate_maze(self) -> list[list]:
         """method to generate maze by following Prims's algorithm"""
         self._grid = [[15 for _ in range(self._width)]
                       for _ in range(self._height)]
@@ -78,7 +79,66 @@ class MazeGenerator:
                 self._grid[new_y][new_x] -= dir_to
                 new_moves = valid_dirs(new_y, new_x)
                 queue.extend(new_moves)
-        return self._grid
+        if self._is_perfect:
+            return self._grid
+        else:
+            def is_3x3_open(r, c, opened_y, opened_x, opened_dir):
+                """Is 3x3 block open after this wall opening?"""
+                for row in range(r, r + 3):
+                    for col in range(c, c + 2):
+                        already_open = (opened_dir == 'E'
+                                        and row == opened_y and col == opened_x)
+                        if not already_open and self._grid[row][col] & E:
+                            return False
+                for row in range(r, r + 2):
+                    for col in range(c, c + 3):
+                        already_open = (opened_dir == 'S'
+                                        and row == opened_y and col == opened_x)
+                        if not already_open and self._grid[row][col] & S:
+                            return False
+                return True
+
+            def scan_area(dead_end: tuple[int, int], open_dir: str) -> bool:
+                """Check if area after opening wall will be smaller than 3x3"""
+                y, x = dead_end
+                dy, dx = directions[open_dir][:2]
+                ny, nx = y + dy, x + dx
+                r_min = max(0, max(y, ny) - 2)
+                r_max = min(self._height - 3, min(y, ny))
+                c_min = max(0, max(x, nx) - 2)
+                c_max = min(self._width - 3,  min(x, nx))
+                for r in range(r_min, r_max + 1):
+                    for c in range(c_min, c_max + 1):
+                        if is_3x3_open(r, c, y, x, open_dir):
+                            return False   # this direction would create a 3x3
+                return True
+
+            def open_wall(dead_end: tuple[int, int]) -> list[list]:
+                """Returns an updated grid with opened dead end on given pos"""
+                y, x = dead_end
+                for direction, (dy, dx,
+                                dir_from, dir_to) in directions.items():
+                    ny, nx = y + dy, x + dx
+                    if not (0 <= ny < self._height and 0 <= nx < self._width):
+                        continue
+                    if (y, x) not in restricted or (ny, nx) not in restricted:
+                        continue
+                    if not self._grid[y][x] & dir_from:
+                        continue
+                    if scan_area((y, x), direction):
+                        self._grid[y][x] -= dir_from
+                        self._grid[ny][nx] -= dir_to
+                        return
+
+            restricted = self.forty_two_symbol()
+            for y, row in enumerate(self._grid):
+                for x, wall in enumerate(row):
+                    if wall in [N + E + S, E + S + W, N + E + W, N + S + W]:
+                        open_wall((y, x))
+            return self._grid
+            #find dead end
+            #check if not in 42 symbol
+            #scan if area won't be open 3x3
 
     def solve_maze(self) -> list[tuple[int, int, str]]:
         """Return the shortest path from ENTRY to EXIT using BFS."""
@@ -139,11 +199,13 @@ class MazeGenerator:
                 for char in line:
                     file.write(char)
                 file.write("\n")
-            file.write(f"\n{self._entry[0]},{self._entry[1]}\n"
-                       f"{self._exit[0]},{self._exit[1]}\n")
+            file.write(f"\n{self._entry[1]},{self._entry[0]}\n"
+                       f"{self._exit[1]},{self._exit[0]}\n")
             try:
                 for move in self._path:
                     file.write(move[2])
                 file.write("\n")
             except AttributeError as e:
                 print(f"{e} (solve_maze() not called)")
+            except IndexError as e:
+                print(f"{e} (entry = exit)")
