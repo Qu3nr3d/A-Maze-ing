@@ -84,6 +84,12 @@ class MazeGenerator:
         else:
             def is_3x3_open(r, c, opened_y, opened_x, opened_dir):
                 """Is 3x3 block open after this wall opening?"""
+                if opened_dir == "N":
+                    opened_dir = "S"
+                    opened_y = opened_y - 1 
+                elif opened_dir == "W":
+                    opened_dir = "E"
+                    opened_x = opened_x - 1 
                 for row in range(r, r + 3):
                     for col in range(c, c + 2):
                         already_open = (opened_dir == 'E'
@@ -121,7 +127,7 @@ class MazeGenerator:
                     ny, nx = y + dy, x + dx
                     if not (0 <= ny < self._height and 0 <= nx < self._width):
                         continue
-                    if (y, x) not in restricted or (ny, nx) not in restricted:
+                    if (y, x) in restricted or (ny, nx) in restricted:
                         continue
                     if not self._grid[y][x] & dir_from:
                         continue
@@ -130,15 +136,12 @@ class MazeGenerator:
                         self._grid[ny][nx] -= dir_to
                         return
 
-            restricted = self.forty_two_symbol()
+            restricted = self.forty_two_symbol() if self._has_forty_two else set()
             for y, row in enumerate(self._grid):
                 for x, wall in enumerate(row):
                     if wall in [N + E + S, E + S + W, N + E + W, N + S + W]:
                         open_wall((y, x))
             return self._grid
-            #find dead end
-            #check if not in 42 symbol
-            #scan if area won't be open 3x3
 
     def solve_maze(self) -> list[tuple[int, int, str]]:
         """Return the shortest path from ENTRY to EXIT using BFS."""
