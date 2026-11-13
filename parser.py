@@ -1,5 +1,5 @@
 import sys
-from src.mazegen import MazeGenerator as mz
+from src.mazegen import MazeGenerator as mg
 
 
 def read_configs() -> dict[str, str]:
@@ -30,7 +30,7 @@ def check_configs(settings: dict[str, int | tuple[int, int] | str | bool])\
         if not (0 <= exit[0] < height) or not (0 <= exit[1] <= width):
             print("Exit outside grid")
             raise ValueError
-        forbidden = mz().forty_two_symbol()
+        forbidden = mg().forty_two_symbol()
         if height > 7 and width > 5:
             if entry in forbidden:
                 print("Entry inside forty_two_symbol")
@@ -59,11 +59,11 @@ def parse_configs(settings_dict: dict[str, str])\
             parsed_settings["PERFECT"] = False
         else:
             parsed_settings["PERFECT"] = True
-            try:
-                if parsed_settings["SEED"] == "":
-                    parsed_settings["SEED"] = None
-            except KeyError:
+        try:
+            if parsed_settings["SEED"] == '':
                 parsed_settings["SEED"] = None
+        except KeyError:
+            parsed_settings["SEED"] = None
     except ValueError:
         print("Invalid filename")
         sys.exit(1)
