@@ -1,13 +1,24 @@
 import random as rnd
+from typing import TypedDict
 from collections import deque
+
+
+class Configs(TypedDict):
+    WIDTH: int
+    HEIGHT: int
+    ENTRY: tuple[int, int]
+    EXIT: tuple[int, int]
+    OUTPUT_FILE: str
+    PERFECT: bool
+    SEED: str | None
 
 
 class MazeGenerator:
     """This class provides methods to generate maze based on given configs"""
-    def __init__(self, configs: dict[str, int | tuple[int, int] | str | bool] =
-                 {"WIDTH": 10, "HEIGHT": 10, "ENTRY": (0,0), "EXIT": (9,9),
+    def __init__(self, configs: Configs =
+                 {"WIDTH": 10, "HEIGHT": 10, "ENTRY": (0, 0), "EXIT": (9, 9),
                   "OUTPUT_FILE": "maze.txt", "PERFECT": True,
-                   "SEED": "42"}) -> None:
+                  "SEED": "42"}) -> None:
         """Saves configurations as attributes"""
         self._width: int = configs["WIDTH"]
         self._height: int = configs["HEIGHT"]
@@ -22,7 +33,7 @@ class MazeGenerator:
         else:
             self._has_forty_two = True
 
-    def forty_two_symbol(self) -> list[tuple[int, int]]:
+    def forty_two_symbol(self) -> set[tuple[int, int]]:
         """Returns restricted '42' symbol area as a list of positions"""
         x, y = self._width // 2, self._height // 2
         points = set([
@@ -34,7 +45,7 @@ class MazeGenerator:
                     ])
         return points
 
-    def generate_maze(self) -> list[list]:
+    def generate_maze(self) -> list[list[int]]:
         """method to generate maze by following Prims's algorithm"""
         self._grid = [[15 for _ in range(self._width)]
                       for _ in range(self._height)]
@@ -46,8 +57,9 @@ class MazeGenerator:
             'W': (0, -1, W, E)
                     }
 
-
-        def valid_dirs(y: int, x: int) -> list[tuple[tuple[int, int]], int] :
+        def valid_dirs(
+                y: int, x: int
+                ) -> list[tuple[tuple[int, int], tuple[int, int], int, int]]:
             """Return a list of possible wall openings"""
             moves = []
             for key, (dy, dx, dir_from, dir_to) in directions.items():
@@ -82,24 +94,28 @@ class MazeGenerator:
         if self._is_perfect:
             return self._grid
         else:
-            def is_3x3_open(r, c, opened_y, opened_x, opened_dir):
+            def is_3x3_open(r: int, c: int,
+                            opened_y: int, opened_x: int, opened_dir: str)\
+                                  -> bool:
                 """Is 3x3 block open after this wall opening?"""
                 if opened_dir == "N":
                     opened_dir = "S"
-                    opened_y = opened_y - 1 
+                    opened_y = opened_y - 1
                 elif opened_dir == "W":
                     opened_dir = "E"
-                    opened_x = opened_x - 1 
+                    opened_x = opened_x - 1
                 for row in range(r, r + 3):
                     for col in range(c, c + 2):
                         already_open = (opened_dir == 'E'
-                                        and row == opened_y and col == opened_x)
+                                        and row == opened_y
+                                        and col == opened_x)
                         if not already_open and self._grid[row][col] & E:
                             return False
                 for row in range(r, r + 2):
                     for col in range(c, c + 3):
                         already_open = (opened_dir == 'S'
-                                        and row == opened_y and col == opened_x)
+                                        and row == opened_y
+                                        and col == opened_x)
                         if not already_open and self._grid[row][col] & S:
                             return False
                 return True
@@ -119,7 +135,7 @@ class MazeGenerator:
                             return False   # this direction would create a 3x3
                 return True
 
-            def open_wall(dead_end: tuple[int, int]) -> list[list]:
+            def open_wall(dead_end: tuple[int, int]) -> None:
                 """Returns an updated grid with opened dead end on given pos"""
                 y, x = dead_end
                 for direction, (dy, dx,
@@ -136,7 +152,10 @@ class MazeGenerator:
                         self._grid[ny][nx] -= dir_to
                         return
 
-            restricted = self.forty_two_symbol() if self._has_forty_two else set()
+            if self._has_forty_two:
+                restricted = self.forty_two_symbol()
+            else:
+                restricted = set()
             for y, row in enumerate(self._grid):
                 for x, wall in enumerate(row):
                     if wall in [N + E + S, E + S + W, N + E + W, N + S + W]:
@@ -152,40 +171,40 @@ class MazeGenerator:
             (0, -1, 'W', 8)
                     ]
 
-        def valid_moves(y: int, x: int) -> list[tuple[int, int],
-                                                tuple[int, int], str] :
+        def valid_moves(y: int, x: int) -> list[
+                tuple[tuple[int, int], tuple[int, int], str]]:
             """Return a list of possible moves"""
             moves = []
             for (dy, dx, dir_to, wall_idx) in directions:
                 ny, nx = y + dy, x + dx
                 if 0 <= ny < self._height and 0 <= nx < self._width:
                     if (ny, nx) not in visited and\
-                        not (self._grid[y][x] & wall_idx):
-                            moves.append(((y, x), (ny, nx), dir_to))
+                                not (self._grid[y][x] & wall_idx):
+                        moves.append(((y, x), (ny, nx), dir_to))
             return moves
 
         visited = set()
         curr_y, curr_x = self._entry
         visited.add((curr_y, curr_x))
-        queue = deque()
+        queue: deque[
+            tuple[tuple[int, int], tuple[int, int], str]
+        ] = deque()
         for new_move in valid_moves(curr_y, curr_x):
             queue.append(new_move)
             visited.add(new_move[1])
-        self._path = {}
+        parents: dict[tuple[int, int], tuple[int, int, str]] = {}
         goal = self._exit
         while queue:
             move = queue.popleft()
             (curr_y, curr_x), (new_y, new_x), dir_to = move
-            self._path.update({(new_y, new_x):(curr_y, curr_x, dir_to)})
+            parents[(new_y, new_x)] = (curr_y, curr_x, dir_to)
             visited.add((new_y, new_x))
             if (new_y, new_x) == goal:
-                self._path.update({(new_y, new_x):(curr_y, curr_x, dir_to)})
-                shortest_route = []
+                shortest_route: list[tuple[int, int, str]] = []
                 while (new_y, new_x) != self._entry:
-                    parent_y, parent_x, dir_to = self._path[(new_y, new_x)]
+                    parent_y, parent_x, dir_to = parents[(new_y, new_x)]
                     shortest_route.append((new_y, new_x, dir_to))
                     new_y, new_x = parent_y, parent_x
-                self._path.clear()
                 shortest_route.reverse()
                 self._path = shortest_route
                 break
@@ -197,7 +216,7 @@ class MazeGenerator:
     def send_maze_to_file(self) -> None:
         with open(f"{self._output_file}", "w") as file:
             formated_grid = [[f"{num:x}" for num in line]
-                              for line in self._grid]
+                             for line in self._grid]
             for line in formated_grid:
                 for char in line:
                     file.write(char)
