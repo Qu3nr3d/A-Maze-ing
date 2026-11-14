@@ -1,6 +1,6 @@
 import sys
 from typing import TypedDict
-from src.mazegen import MazeGenerator as mg  # type: ignore[import]
+from src.mazegen import mazegen as mg  # type: ignore[import]
 
 
 class Configs(TypedDict):
@@ -42,7 +42,7 @@ def check_configs(
     if not (0 <= exit[0] < height) or not (0 <= exit[1] <= width):
         print("Exit outside grid")
         raise ValueError
-    forbidden = mg().forty_two_symbol()
+    forbidden = mg.MazeGenerator().forty_two_symbol()
     if height > 7 and width > 5:
         if entry in forbidden:
             print("Entry inside forty_two_symbol")
