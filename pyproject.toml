@@ -2,7 +2,8 @@
 name = "mazegen"
 version = "0.1.0"
 description = "Reusable maze generation and solving algorithms"
-readme = "README.md"
+readme = "src/mazegen/README.md"
+license = { file = "src/mazegen/LICENSE.md" }
 requires-python = ">=3.10"
 authors = [
     { name = "jziental" },

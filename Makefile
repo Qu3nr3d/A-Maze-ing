@@ -12,6 +12,9 @@ install:
 run:
 	$(PYTHON) $(SCRIPT) $(CONFIG)
 
+build:
+	uv build -o .
+	
 debug:
 	$(PYTHON) -m pdb $(SCRIPT) $(CONFIG)
 
