@@ -224,7 +224,7 @@ def load_maze(path: Path,) -> tuple[list[list[int]],tuple[int, int],tuple[int, i
     return grid, entry, exit_pos, solution
 
 
-if __name__ == "__main__":
+def main() -> None:
     project_dir = Path(__file__).resolve().parents[2]
     maze_path = project_dir / "maze.txt"
     try:
@@ -238,3 +238,7 @@ if __name__ == "__main__":
         app.run()
     except (OSError, ValueError, StopIteration) as error:
         print(f"Error loading maze: {error}")
+
+
+if __name__ == "__main__":
+    main()
