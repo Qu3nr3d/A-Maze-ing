@@ -162,5 +162,6 @@ S: switch on/off path showing
 [Subject](https://cdn.intra.42.fr/pdf/pdf/224851/en.subject.pdf)\
 [Prims's algorithm](https://en.wikipedia.org/wiki/Prim%27s_algorithm)\
 [A-maze-ing website with visualization](https://amazeing.app/learn?algorithm=Prims)
+[chosing license](https://docs.python-guide.org/writing/license/)
 ### AI Usage
 AI was used to understand Prim's algorithm , to debug the imperfect maze generation logic, and to learn MLX library usage for graphical rendering.
