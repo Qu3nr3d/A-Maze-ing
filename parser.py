@@ -13,11 +13,11 @@ class Configs(TypedDict):
     SEED: str | None
 
 
-def read_configs() -> dict[str, str]:
+def read_configs(filename: str) -> dict[str, str]:
     """read config.txt file, exits in case of fail"""
     settings_dict: dict[str, str] = {}
     try:
-        with open("config.txt") as config:
+        with open(filename) as config:
             config_lines = [line.strip() for line in config if line[0] != "#"]
             settings_dict = {(setting.split("=")[0]): (setting.split("=")[1])
                              for setting in config_lines}
