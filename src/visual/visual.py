@@ -3,9 +3,11 @@ from mlx import Mlx
 from pathlib import Path
 
 class MazeRenderer:
-    CELL = 60
-    MARGIN = 40
-    TOP = 60
+    CELL = 40
+    MARGIN = 150
+    TOP = 100
+    WINDOW_WIDTH = 1000
+    WINDOW_HEIGHT = 1000
     WALL_COLORS = [
         0xFFFFFFFF,  # White
         0xFF00C8FF,  # Cyan
@@ -26,15 +28,25 @@ class MazeRenderer:
         self.cols = len(grid[0])
         self.show_path = False
         self.color_index = 0
-        width = self.cols * self.CELL + 2 * self.MARGIN
-        height = self.rows * self.CELL + self.TOP + self.MARGIN
+
+        available_width = self.WINDOW_WIDTH - 2 * self.MARGIN
+        available_height = self.WINDOW_HEIGHT - self.TOP - self.MARGIN
+        cell_width = available_width // self.cols
+        cell_height = available_height // self.cols
+        self.CELL = max(1,min(cell_width, cell_height))
+        maze_width = self.cols * self.CELL
+        maze_hight = self.rows * self.CELL
+        self.offset_x = (self.WINDOW_WIDTH - maze_width) // 2
+        self.offset_y = self.TOP + (available_height - maze_hight) // 2
+
         self.m = Mlx()
         self.mlx_ptr = self.m.mlx_init()
 
         if self.mlx_ptr is None:
             raise RuntimeError("mlx_init failed")
+        
         self.win_ptr = self.m.mlx_new_window(
-            self.mlx_ptr, width, height, "A-Maze-ing"
+            self.mlx_ptr, 1920, 1080, "A-Maze-ing"
         )
 
         if self.win_ptr is None:
@@ -59,8 +71,8 @@ class MazeRenderer:
             )
 
     def marker(self, x: int, y: int, color: int) -> None:
-        cx = self.MARGIN + x * self.CELL + self.CELL // 2
-        cy = self.TOP + y * self.CELL + self.CELL // 2
+        cx = self.offset_x + x * self.CELL + self.CELL // 2
+        cy = self.offset_y + y * self.CELL + self.CELL // 2
 
         for dy in range(-4, 5):
             for dx in range(-4, 5):
@@ -82,8 +94,8 @@ class MazeRenderer:
 
         for direction in self.solution:
             dx, dy = moves[direction]
-            x1 = self.MARGIN + x * self.CELL + self.CELL // 2
-            y1 = self.TOP + y * self.CELL + self.CELL // 2
+            x1 = self.offset_x + x * self.CELL + self.CELL // 2
+            y1 = self.offset_y + y * self.CELL + self.CELL // 2
             x2 = x1 + dx * self.CELL
             y2 = y1 + dy * self.CELL
             if dx != 0:
@@ -123,15 +135,15 @@ class MazeRenderer:
 
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):
-                px = self.MARGIN + x * self.CELL
-                py = self.TOP + y * self.CELL
+                px = self.offset_x + x * self.CELL
+                py = self.offset_y + y * self.CELL
 
                 if cell == 0xF:
                     self.fill_cell(px, py, color)
                     continue
-                if cell & 1:  # North
+                if cell & 1:
                     self.horizontal(px, py, color)
-                if cell & 8:  # West
+                if cell & 8:
                     self.vertical(px, py, color)
                 if y == self.rows - 1 and cell & 4:
                     self.horizontal(
