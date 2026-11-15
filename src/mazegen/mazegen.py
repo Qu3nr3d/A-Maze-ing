@@ -82,8 +82,8 @@ class MazeGenerator:
         queue = valid_dirs(curr_y, curr_x)
         visited.add((curr_y, curr_x))
         while queue:
-            move = rnd.choice(queue)
-            queue.remove(move)
+            idx = rnd.randrange(len(queue))
+            move = queue.pop(idx)
             (curr_y, curr_x), (new_y, new_x), dir_from, dir_to = move
             if (new_y, new_x) not in visited:
                 visited.add((new_y, new_x))
