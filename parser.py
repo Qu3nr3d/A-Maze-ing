@@ -24,12 +24,12 @@ def read_configs(filename: str) -> dict[str, str]:
             config_lines = [line.strip() for line in config if line[0] != "#"]
             for line in config_lines:
                 if line.split("=")[0] not in ["WIDTH",
-                                            "HEIGHT",
-                                            "ENTRY",
-                                            "EXIT",
-                                            "OUTPUT_FILE",
-                                            "PERFECT",
-                                            "SEED"]:
+                                              "HEIGHT",
+                                              "ENTRY",
+                                              "EXIT",
+                                              "OUTPUT_FILE",
+                                              "PERFECT",
+                                              "SEED"]:
                     print(f"Invalid configuration: {line}", end="")
                     raise ValueError
             settings_dict = {(setting.split("=")[0]): (setting.split("=")[1])

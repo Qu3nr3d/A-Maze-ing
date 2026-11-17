@@ -2,7 +2,7 @@
 PYTHON = python3
 SCRIPT = a_maze_ing.py
 CONFIG = config.txt
-FILES = a_maze_ing.py src/mazegen/visual.py src/mazegen/mazegen.py parser.py
+FILES = a_maze_ing.py parser.py src/visual/visual.py src/mazegen/mazegen.py
 
 .PHONY: install run debug clean lint lint-strict
 

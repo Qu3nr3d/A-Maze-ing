@@ -27,5 +27,6 @@ def main() -> None:
     else:
         print("Usage: uv run python3 a_maze_ing.py config.txt")
 
+
 if __name__ == "__main__":
     main()
