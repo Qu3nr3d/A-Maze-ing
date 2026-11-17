@@ -1,6 +1,7 @@
 import random as rnd
 from typing import TypedDict
 from collections import deque
+from collections.abc import Callable
 
 
 class Configs(TypedDict):
@@ -32,7 +33,26 @@ class MazeGenerator:
             print("42 symbol ommited (grid size too small)")
         else:
             self._has_forty_two = True
+    @property
+    def grid(self):
+        return self._grid
+    
+    @property
+    def entry(self) -> tuple[int, int]:
+        return self._entry
+    
+    @property
+    def exit(self) -> tuple[int, int]:
+        return self._exit
+    
+    @property
+    def grid(self) -> list[list[int]]:
+        return self._grid
 
+    @property
+    def solution_str(self) -> str:
+        return "".join(move[2] for move in getattr(self, "_path", []))
+    
     def forty_two_symbol(self) -> set[tuple[int, int]]:
         """Returns restricted '42' symbol area as a list of positions"""
         x, y = self._width // 2, self._height // 2
@@ -231,3 +251,10 @@ class MazeGenerator:
                 print(f"{e} (solve_maze() not called)")
             except IndexError as e:
                 print(f"{e} (entry = exit)")
+    
+    def regenerate(self) -> tuple[list[list[int]], str]:
+        self._seed = rnd.randrange(10**5)
+        self.generate_maze()
+        self.solve_maze()
+        self.send_maze_to_file()
+        return self.grid, self.solution_str

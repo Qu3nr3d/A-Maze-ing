@@ -13,10 +13,19 @@ def main() -> None:
             print(f"{e}")
         configs = parser.parse_configs(unparsed)
         labirynth = mg.MazeGenerator(configs)
-        labirynth.generate_maze()
+        grid = labirynth.generate_maze()
         labirynth.solve_maze()
         labirynth.send_maze_to_file()
-
+        app = visual.MazeRenderer(
+            grid=grid,
+            entry=labirynth.entry,
+            exit=labirynth.exit,
+            solution=labirynth.solution_str,
+            regenerate=labirynth.regenerate
+        )
+        app.run()
+    else:
+        print("Usage: uv run python3 a_maze_ing.py config.txt")
 
 if __name__ == "__main__":
     main()
