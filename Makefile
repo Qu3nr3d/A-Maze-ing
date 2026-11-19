@@ -10,7 +10,7 @@ install:
 	uv sync
 
 run:
-	$(PYTHON) $(SCRIPT) $(CONFIG)
+	uv run $(PYTHON) $(SCRIPT) $(CONFIG)
 
 build:
 	uv build -o .
