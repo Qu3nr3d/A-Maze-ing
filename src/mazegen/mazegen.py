@@ -27,31 +27,37 @@ class MazeGenerator:
         self._output_file: str = configs["OUTPUT_FILE"]
         self._is_perfect: bool = configs["PERFECT"]
         self._seed: str | int | None = configs["SEED"]
-        if self._height <= 5 or self._width <= 7:
+        if 0 < self._height <= 5 or 0 < self._width <= 7:
             self._has_forty_two = False
             print("42 symbol ommited (grid size too small)")
         else:
             self._has_forty_two = True
+        self._path: list[tuple[int, int, str]] = []
+        self._edges = 0
 
     @property
     def grid(self) -> list[list[int]]:
+        """Return maze as a list"""
         return self._grid
 
     @property
     def entry(self) -> tuple[int, int]:
+        """Return entry point as a tuple"""
         return self._entry
 
     @property
     def exit(self) -> tuple[int, int]:
+        """Return exit point as a tuple"""
         return self._exit
 
     @property
     def solution_str(self) -> str:
+        "Return path from entry to exit as a str with chars N, E, S, W"
         return "".join(move[2] for move in getattr(self, "_path", []))
 
     def forty_two_symbol(self) -> set[tuple[int, int]]:
         """Returns restricted '42' symbol area as a list of positions"""
-        x, y = self._width // 2, self._height // 2
+        x, y = self._width // 2 - 1, self._height // 2 - 1
         points = set([
             (y - 2, x - 3), (y - 1, x - 3), (y, x - 3),
             (y, x - 2), (y, x - 1), (y + 1, x - 1), (y + 2, x - 1),
@@ -107,13 +113,14 @@ class MazeGenerator:
                 self._grid[new_y][new_x] -= dir_to
                 new_moves = valid_dirs(new_y, new_x)
                 queue.extend(new_moves)
+
         if self._is_perfect:
             return self._grid
         else:
             def is_3x3_open(r: int, c: int,
                             opened_y: int, opened_x: int, opened_dir: str)\
                                   -> bool:
-                """Is 3x3 block open after this wall opening?"""
+                """Checks if 3x3 block is open after this wall opening"""
                 if opened_dir == "N":
                     opened_dir = "S"
                     opened_y = opened_y - 1
@@ -151,8 +158,8 @@ class MazeGenerator:
                             return False   # this direction would create a 3x3
                 return True
 
-            def open_wall(dead_end: tuple[int, int]) -> None:
-                """Returns an updated grid with opened dead end on given pos"""
+            def open_wall(dead_end: tuple[int, int]) -> bool:
+                """Updates grid with opened dead end on given position"""
                 y, x = dead_end
                 for direction, (dy, dx,
                                 dir_from, dir_to) in directions.items():
@@ -166,20 +173,57 @@ class MazeGenerator:
                     if scan_area((y, x), direction):
                         self._grid[y][x] -= dir_from
                         self._grid[ny][nx] -= dir_to
-                        return
+                        return True
+                    return False
+                return False
+
+            def has_minimum_two_loops() -> bool:
+                """Check if maze has minimum two loops
+
+                based on formula:
+                l = e - v + 1,
+                where:
+                l - loops,
+                e - edges,
+                v - vertices"""
+                edges = self._edges
+                for y in range(self._height):
+                    for x in range(self._width):
+                        if not (self._grid[y][x] & E):  # open east wall
+                            edges += 1
+                        if not (self._grid[y][x] & S):  # open south wall
+                            edges += 1
+                loops = edges - (self._height * self._width - 1)
+                self._edges = edges
+                return loops > 1
 
             if self._has_forty_two:
                 restricted = self.forty_two_symbol()
             else:
                 restricted = set()
+            three_walls = [N + E + S, E + S + W, N + E + W, N + S + W]
             for y, row in enumerate(self._grid):
                 for x, wall in enumerate(row):
-                    if wall in [N + E + S, E + S + W, N + E + W, N + S + W]:
+                    if wall in three_walls:
                         open_wall((y, x))
+            if has_minimum_two_loops():
+                pass
+            else:
+                for y, row in enumerate(self._grid):
+                    if has_minimum_two_loops():
+                        break
+                    for x, wall in enumerate(row):
+                        if wall not in [0, 1]:
+                            if open_wall((y, x)):
+                                if has_minimum_two_loops():
+                                    break
             return self._grid
 
     def solve_maze(self) -> list[tuple[int, int, str]]:
-        """Return the shortest path from ENTRY to EXIT using BFS."""
+        """Return the shortest path from ENTRY to EXIT using BFS.
+
+        Returned list consists of positions and string indicating
+        direction to the next cell from entry to exit: (y, x , direction)"""
         directions = [
             (-1, 0, 'N', 1),
             (0, 1, 'E', 2),
@@ -230,6 +274,7 @@ class MazeGenerator:
         return self._path
 
     def send_maze_to_file(self) -> None:
+        "Saves maze characteristics to a file"
         with open(f"{self._output_file}", "w") as file:
             formated_grid = [[f"{num:x}" for num in line]
                              for line in self._grid]
@@ -249,6 +294,7 @@ class MazeGenerator:
                 print(f"{e} (entry = exit)")
 
     def regenerate(self) -> tuple[list[list[int]], str]:
+        "Generates, solves and save to file maze with new random seed"
         self._seed = rnd.randrange(10**5)
         self.generate_maze()
         self._path = self.solve_maze()
