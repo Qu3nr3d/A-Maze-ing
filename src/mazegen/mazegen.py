@@ -26,7 +26,7 @@ class MazeGenerator:
         self._exit: tuple[int, int] = configs["EXIT"]
         self._output_file: str = configs["OUTPUT_FILE"]
         self._is_perfect: bool = configs["PERFECT"]
-        self._seed = configs["SEED"]
+        self._seed: str | int | None = configs["SEED"]
         if self._height <= 5 or self._width <= 7:
             self._has_forty_two = False
             print("42 symbol ommited (grid size too small)")
@@ -34,7 +34,7 @@ class MazeGenerator:
             self._has_forty_two = True
 
     @property
-    def grid(self):
+    def grid(self) -> list[list[int]]:
         return self._grid
 
     @property

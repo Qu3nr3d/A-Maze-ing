@@ -1,6 +1,6 @@
 import sys
 from typing import TypedDict
-from src.mazegen import mazegen as mg  # type: ignore[import]
+from src.mazegen import mazegen as mg
 
 
 class Configs(TypedDict):

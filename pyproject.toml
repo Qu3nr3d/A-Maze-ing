@@ -28,3 +28,10 @@ dev = [
 
 [tool.uv.sources]
 mlx = { path = "mlx-2.2-py3-none-any.whl" }
+
+[tool.mypy]
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = "mlx"
+ignore_missing_imports = true
