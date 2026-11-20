@@ -1,10 +1,7 @@
-"""MiniLibX visualization for the A-Maze-ing project."""
-
 from collections.abc import Callable
 from pathlib import Path
 import re
 import subprocess
-
 from mlx import Mlx
 
 
@@ -87,7 +84,8 @@ class MazeRenderer:
 
     @staticmethod
     def _window_size() -> tuple[int, int]:
-        """Use the WSL/X11 screen dimensions when available, or a safe default."""
+        """Use the WSL/X11 screen dimensions when available,
+        or a safe default."""
         try:
             result = subprocess.run(
                 ["xrandr", "--current"],
@@ -118,7 +116,8 @@ class MazeRenderer:
         return self.window_height - self.TOP - self.BOTTOM
 
     def _clamp_view(self) -> None:
-        """Keep the maze centered when small, or prevent scrolling beyond it."""
+        """Keep the maze centered when small,
+        or prevent scrolling beyond it."""
         maze_w = self.cols * self.CELL
         maze_h = self.rows * self.CELL
 
@@ -168,9 +167,14 @@ class MazeRenderer:
         """Zoom around the center of the visible area."""
         old_cell = self.CELL
         if zoom_in:
-            new_cell = min(self.MAX_CELL * 2, max(old_cell + 1, round(old_cell * 1.25)))
+            new_cell = min(
+                self.MAX_CELL * 2,
+                max(old_cell + 1,
+                    round(old_cell * 1.25)))
         else:
-            new_cell = max(self.MIN_CELL, min(old_cell - 1, round(old_cell / 1.25)))
+            new_cell = max(self.MIN_CELL,
+                           min(old_cell - 1,
+                               round(old_cell / 1.25)))
         if new_cell == old_cell:
             return
 
@@ -185,7 +189,8 @@ class MazeRenderer:
         self.draw()
 
     def pan(self, dx: int, dy: int) -> None:
-        """Move the visible area without allowing blank space beyond the maze."""
+        """Move the visible area without
+        allowing blank space beyond the maze."""
         self.offset_x += dx
         self.offset_y += dy
         self._clamp_view()
@@ -252,13 +257,15 @@ class MazeRenderer:
 
             # Avoid drawing path segments that are fully outside the view.
             if dx:
-                if (self.TOP - after <= py < self.window_height - self.BOTTOM + before
+                if (self.TOP - after
+                    <= py < self.window_height - self.BOTTOM + before
                         and max(px, nx) >= self.LEFT
                         and min(px, nx) < self.window_width - self.RIGHT):
                     for offset in range(-before, after + 1):
                         self.horizontal(min(px, nx), py + offset, color)
             elif (
-                self.LEFT - after <= px < self.window_width - self.RIGHT + before
+                self.LEFT - after <=
+                px < self.window_width - self.RIGHT + before
                 and max(py, ny) >= self.TOP
                 and min(py, ny) < self.window_height - self.BOTTOM
             ):
@@ -289,7 +296,8 @@ class MazeRenderer:
         first_row = max(0, (self.TOP - self.offset_y) // self.CELL - 1)
         last_row = min(
             self.rows,
-            (self.window_height - self.BOTTOM - self.offset_y) // self.CELL + 2,
+            (self.window_height - self.BOTTOM - self.offset_y)
+            // self.CELL + 2,
         )
 
         for y in range(first_row, last_row):
@@ -348,7 +356,8 @@ class MazeRenderer:
                 self._validate_grid(new_grid)
                 new_rows = len(new_grid)
                 new_cols = len(new_grid[0])
-                for name, (x, y) in (("Entry", self.entry), ("Exit", self.exit)):
+                for name, (x, y) in (("Entry", self.entry),
+                                     ("Exit", self.exit)):
                     if not (0 <= x < new_cols and 0 <= y < new_rows):
                         raise ValueError(f"{name} is outside regenerated maze")
                 self.grid = new_grid
@@ -377,7 +386,8 @@ class MazeRenderer:
 def load_maze(
     path: Path,
 ) -> tuple[list[list[int]], tuple[int, int], tuple[int, int], str]:
-    """Load hexadecimal wall data, entry, exit and solution from a text file."""
+    """Load hexadecimal wall data, entry,
+    exit and solution from a text file."""
     lines = path.read_text(encoding="utf-8").splitlines()
     try:
         separator = next(i for i, line in enumerate(lines) if not line.strip())

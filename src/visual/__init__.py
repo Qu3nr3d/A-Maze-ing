@@ -1,3 +1,3 @@
-from ..mazegen.mazegen import MazeGenerator
+from .visual import MazeRenderer
 
-__all__ = ["MazeGenerator"]
+__all__ = ["MazeRenderer"]

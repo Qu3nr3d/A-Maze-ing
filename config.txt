@@ -1,8 +1,8 @@
 # Every setting has to be in one line with it's value
 # Maze width (number of cells):
-WIDTH=40
+WIDTH=1000
 # Maze height
-HEIGHT=60
+HEIGHT=1000
 # Entry coordinates (x,y):
 ENTRY=0,0
 # Exit coordinates (x,y)
