@@ -30,8 +30,7 @@ def read_configs(filename: str) -> dict[str, str]:
                                               "OUTPUT_FILE",
                                               "PERFECT",
                                               "SEED"]:
-                    print(f"Invalid configuration: {line}", end="")
-                    raise ValueError
+                    raise ValueError(f"Invalid configuration: {line}", end="")
             settings_dict = {(setting.split("=")[0]): (setting.split("=")[1])
                              for setting in config_lines
                              if len(setting.split("=")) == 2}
@@ -54,13 +53,11 @@ def check_configs(settings: Configs) -> None:
         print("Invalid maze size")
         raise ValueError
     if not (0 <= entry[0] < height) or not (0 <= entry[1] < width):
-        print("Entry outside grid")
-        raise ValueError
+        raise ValueError("Entry outside grid")
     if not (0 <= exit[0] < height) or not (0 <= exit[1] < width):
-        print("Exit outside grid")
-        raise ValueError
+        raise ValueError("Exit outside grid")
     if entry == exit:
-        raise ValueError
+        raise ValueError("Entry and exit at the same position")
     forbidden = mg.MazeGenerator().forty_two_symbol()
     if 7 < height < 500 and 5 < width < 500:
         if entry in forbidden:
