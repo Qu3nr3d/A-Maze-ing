@@ -3,7 +3,6 @@ from pathlib import Path
 import re
 import subprocess
 from mlx import Mlx
-from ..mazegen import MazeGenerator, Configs
 
 
 class MazeRenderer:
@@ -32,7 +31,6 @@ class MazeRenderer:
         entry: tuple[int, int],
         exit: tuple[int, int],
         solution: str,
-        config: Configs,
         regenerate: Callable[[], tuple[list[list[int]], str]] | None = None,
     ) -> None:
         """Store maze data, select initial scale and create an MLX window."""
@@ -45,7 +43,6 @@ class MazeRenderer:
         self.rows = len(grid)
         self.cols = len(grid[0])
         self._validate_endpoints()
-        self._config = config
 
         self.show_path = False
         self.color_index = 0
@@ -303,13 +300,12 @@ class MazeRenderer:
             // self.CELL + 2,
         )
 
-        forbidden = MazeGenerator(self._config).forty_two_symbol()
         for y in range(first_row, last_row):
             for x in range(first_col, last_col):
                 cell = self.grid[y][x]
                 px = self.offset_x + x * self.CELL
                 py = self.offset_y + y * self.CELL
-                if (y, x) in forbidden:
+                if cell == 0xF:
                     self.fill_cell(px, py, color)
                     continue
                 if cell & 1:

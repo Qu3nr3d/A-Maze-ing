@@ -1,4 +1,3 @@
-from .mazegen import MazeGenerator, Configs
+from .mazegen import MazeGenerator
 
-__all__ = ["MazeGenerator",
-           "Configs"]
+__all__ = ["MazeGenerator"]

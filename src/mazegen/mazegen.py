@@ -88,7 +88,7 @@ class MazeGenerator:
                 ) -> list[tuple[tuple[int, int], tuple[int, int], int, int]]:
             """Return a list of possible wall openings"""
             moves = []
-            for key, (dy, dx, dir_from, dir_to) in directions.items():
+            for _, (dy, dx, dir_from, dir_to) in directions.items():
                 ny, nx = y + dy, x + dx
                 if 0 <= ny < self._height and 0 <= nx < self._width:
                     if (ny, nx) not in visited:
