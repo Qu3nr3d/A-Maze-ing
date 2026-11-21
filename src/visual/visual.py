@@ -3,6 +3,7 @@ from pathlib import Path
 import re
 import subprocess
 from mlx import Mlx
+from ..mazegen import MazeGenerator, Configs
 
 
 class MazeRenderer:
@@ -31,6 +32,7 @@ class MazeRenderer:
         entry: tuple[int, int],
         exit: tuple[int, int],
         solution: str,
+        config: Configs,
         regenerate: Callable[[], tuple[list[list[int]], str]] | None = None,
     ) -> None:
         """Store maze data, select initial scale and create an MLX window."""
@@ -43,6 +45,7 @@ class MazeRenderer:
         self.rows = len(grid)
         self.cols = len(grid[0])
         self._validate_endpoints()
+        self._config = config
 
         self.show_path = False
         self.color_index = 0
@@ -300,12 +303,13 @@ class MazeRenderer:
             // self.CELL + 2,
         )
 
+        forbidden = MazeGenerator(self._config).forty_two_symbol()
         for y in range(first_row, last_row):
             for x in range(first_col, last_col):
                 cell = self.grid[y][x]
                 px = self.offset_x + x * self.CELL
                 py = self.offset_y + y * self.CELL
-                if cell == 0xF:
+                if (y, x) in forbidden:
                     self.fill_cell(px, py, color)
                     continue
                 if cell & 1:
@@ -407,19 +411,3 @@ def load_maze(
     if any(move not in "NESW" for move in solution):
         raise ValueError("Invalid solution path")
     return grid, (entry_x, entry_y), (exit_x, exit_y), solution
-
-
-def main() -> None:
-    """Launch the visualizer directly, reading the project's maze.txt."""
-    project_dir = Path(__file__).resolve().parents[2]
-    maze_path = project_dir / "maze.txt"
-    try:
-        grid, entry, exit_pos, solution = load_maze(maze_path)
-        app = MazeRenderer(grid, entry, exit_pos, solution)
-        app.run()
-    except (OSError, ValueError) as error:
-        print(f"Error loading maze: {error}")
-
-
-if __name__ == "__main__":
-    main()

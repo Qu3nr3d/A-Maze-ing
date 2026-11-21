@@ -21,6 +21,7 @@ def main() -> None:
             entry=(labirynth.entry[1], labirynth.entry[0]),
             exit=(labirynth.exit[1], labirynth.exit[0]),
             solution=labirynth.solution_str,
+            config=configs,
             regenerate=labirynth.regenerate
         )
         app.run()

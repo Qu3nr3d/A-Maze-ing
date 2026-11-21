@@ -1,14 +1,14 @@
-d3955113
-b8417aee
-c2907c53
-faeafffa
-fc7857fa
-fffafffa
-d3fafd52
-d2fafffa
-d2d4157a
-d455457e
+9151153
+aa9283a
+c2a86c6
+f82afff
+fc6857f
+fffafff
+93fafff
+c2fafff
+9438153
+c546c56
 
 0,1
 2,1
-SENE
+NEEESW

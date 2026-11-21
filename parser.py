@@ -30,7 +30,7 @@ def read_configs(filename: str) -> dict[str, str]:
                                               "OUTPUT_FILE",
                                               "PERFECT",
                                               "SEED"]:
-                    raise ValueError(f"Invalid configuration: {line}", end="")
+                    raise ValueError(f"Invalid configuration: {line}")
             settings_dict = {(setting.split("=")[0]): (setting.split("=")[1])
                              for setting in config_lines
                              if len(setting.split("=")) == 2}
@@ -60,7 +60,6 @@ def check_configs(settings: Configs) -> None:
     if entry == exit:
         raise ValueError("Entry and exit at the same position")
     forbidden = mg.MazeGenerator(settings).forty_two_symbol()
-    print(forbidden)
     if 5 < height < 500 and 7 < width < 500:
         if entry in forbidden:
             raise ValueError(f"Entry inside forty_two_symbol"
