@@ -27,7 +27,7 @@ class MazeGenerator:
         self._output_file: str = configs["OUTPUT_FILE"]
         self._is_perfect: bool = configs["PERFECT"]
         self._seed: str | int | None = configs["SEED"]
-        if 0 < self._height <= 5 or 0 < self._width < 7:
+        if 0 < self._height <= 5 or 0 < self._width < 8:
             self._has_forty_two = False
             print("42 symbol ommited (grid size too small)")
         else:
