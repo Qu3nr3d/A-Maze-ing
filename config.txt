@@ -1,16 +1,16 @@
 # Every setting has to be in one line with it's value
 # Maze width (number of cells):
-WIDTH=1000
+WIDTH=8
 # Maze height
-HEIGHT=1000
+HEIGHT=10
 # Entry coordinates (x,y):
-ENTRY=0,0
+ENTRY=0,1
 # Exit coordinates (x,y)
-EXIT=5,0
+EXIT=2,1
 # Output filename
 OUTPUT_FILE=maze.txt
 # Is the maze perfect?
-PERFECT=False
+PERFECT=true
 # If SEED setting is invalid/empty seed is set to None
 # meaning randomness is based on system time
 SEED=

@@ -49,7 +49,8 @@ def check_configs(settings: Configs) -> None:
     height = settings["HEIGHT"]
     entry = settings["ENTRY"]
     exit = settings["EXIT"]
-    if width < 2 or height < 2:
+    print(entry, exit)
+    if width < 3 or height < 3:
         print("Invalid maze size")
         raise ValueError
     if not (0 <= entry[0] < height) or not (0 <= entry[1] < width):
@@ -58,16 +59,14 @@ def check_configs(settings: Configs) -> None:
         raise ValueError("Exit outside grid")
     if entry == exit:
         raise ValueError("Entry and exit at the same position")
-    forbidden = mg.MazeGenerator().forty_two_symbol()
-    if 7 < height < 500 and 5 < width < 500:
+    forbidden = mg.MazeGenerator(settings).forty_two_symbol()
+    print(forbidden)
+    if 5 < height < 500 and 7 < width < 500:
         if entry in forbidden:
-            print("Entry inside forty_two_symbol")
-            raise ValueError
-        if exit in forbidden:
-            print("Exit inside forty_two_symbol")
-            raise ValueError
-    else:
-        raise ValueError("Invalid grid size")
+            raise ValueError(f"Entry inside forty_two_symbol"
+                             f"{entry[1],entry[0]}")
+        elif exit in forbidden:
+            raise ValueError("Exit inside forty_two_symbol")
 
 
 def parse_configs(settings_dict: dict[str, str])\
@@ -76,8 +75,8 @@ def parse_configs(settings_dict: dict[str, str])\
         width = int(settings_dict["WIDTH"])
         height = int(settings_dict["HEIGHT"])
         entry = (
-            int(settings_dict["ENTRY"].split(",")[0]),
-            int(settings_dict["ENTRY"].split(",")[1])
+            int(settings_dict["ENTRY"].split(",")[1]),
+            int(settings_dict["ENTRY"].split(",")[0])
         )
         exit = (
             int(settings_dict["EXIT"].split(",")[1]),

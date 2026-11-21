@@ -18,7 +18,7 @@ def main() -> None:
         labirynth.send_maze_to_file()
         app = visual.MazeRenderer(
             grid=grid,
-            entry=(labirynth.entry[0], labirynth.entry[1]),
+            entry=(labirynth.entry[1], labirynth.entry[0]),
             exit=(labirynth.exit[1], labirynth.exit[0]),
             solution=labirynth.solution_str,
             regenerate=labirynth.regenerate

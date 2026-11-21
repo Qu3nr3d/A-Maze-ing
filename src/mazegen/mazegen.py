@@ -27,7 +27,7 @@ class MazeGenerator:
         self._output_file: str = configs["OUTPUT_FILE"]
         self._is_perfect: bool = configs["PERFECT"]
         self._seed: str | int | None = configs["SEED"]
-        if 0 < self._height <= 5 or 0 < self._width <= 7:
+        if 0 < self._height <= 5 or 0 < self._width < 7:
             self._has_forty_two = False
             print("42 symbol ommited (grid size too small)")
         else:
@@ -57,7 +57,11 @@ class MazeGenerator:
 
     def forty_two_symbol(self) -> set[tuple[int, int]]:
         """Returns restricted '42' symbol area as a list of positions"""
-        x, y = self._width // 2 - 1, self._height // 2 - 1
+        if self._width == 7:
+            x, y = self._width // 2, self._height // 2
+        else:
+            x, y = self._width // 2 - 1, self._height // 2
+
         points = set([
             (y - 2, x - 3), (y - 1, x - 3), (y, x - 3),
             (y, x - 2), (y, x - 1), (y + 1, x - 1), (y + 2, x - 1),
